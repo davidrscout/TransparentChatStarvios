@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Transparent Chat Starvios" Icon="icon.ico"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ResizeMode="CanResizeWithGrip" ShowInTaskbar="True"
+        Topmost="True" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False" ShowActivated="False"
         MinWidth="180" MinHeight="120"
         UseLayoutRounding="True" SnapsToDevicePixels="True"
         TextOptions.TextFormattingMode="Display">
@@ -44,7 +44,7 @@
                 MouseLeftButtonDown="Bar_MouseLeftButtonDown">
             <DockPanel LastChildFill="True">
                 <Button DockPanel.Dock="Right" Style="{StaticResource BarButton}" Content="✕" ToolTip="Cerrar" Click="Close_Click"/>
-                <Button DockPanel.Dock="Right" Style="{StaticResource BarButton}" Content="🔒" ToolTip="Bloquear: el ratón atraviesa el chat (Ctrl+Shift+F12 para desbloquear)" Click="Lock_Click"/>
+                <Button DockPanel.Dock="Right" Style="{StaticResource BarButton}" Content="🔒" ToolTip="Bloquear: el ratón atraviesa el chat (desbloquear: icono de la bandeja o Ctrl+Shift+F12)" Click="Lock_Click"/>
                 <Button DockPanel.Dock="Right" Style="{StaticResource BarButton}" Content="⚙" ToolTip="Ajustes" Click="Settings_Click"/>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                     <Ellipse x:Name="StatusDot" Width="8" Height="8" Fill="Gray" Margin="0,0,6,0"/>

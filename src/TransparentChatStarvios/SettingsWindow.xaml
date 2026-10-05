@@ -40,7 +40,7 @@
         <CheckBox x:Name="TextShadow" Content="Sombra en el texto (se lee mejor sobre el juego)"/>
 
         <TextBlock Foreground="#99EDEAF5" FontSize="11" TextWrapping="Wrap" Margin="0,14,0,0"
-                   Text="🔒 bloquea el chat: el ratón lo atraviesa y la barra desaparece. Para desbloquear pulsa Ctrl+Shift+F12 o haz clic en su icono de la barra de tareas."/>
+                   Text="🔒 bloquea el chat: el ratón lo atraviesa y la barra desaparece. Para desbloquear haz clic en su icono de los iconos ocultos de la barra de tareas (junto al reloj) o pulsa Ctrl+Shift+F12."/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="Cancelar" Width="90" Margin="0,0,8,0" IsCancel="True"/>

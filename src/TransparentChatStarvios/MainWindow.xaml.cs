@@ -31,7 +31,8 @@ public partial class MainWindow : Window
     readonly DispatcherTimer _debounce = new() { Interval = TimeSpan.FromMilliseconds(400) };
     readonly DispatcherTimer _hideTimer = new() { Interval = TimeSpan.FromSeconds(1) };
     bool _autoScroll = true;
-    bool _ready;
+    readonly DispatcherTimer _topmost = new() { Interval = TimeSpan.FromSeconds(2) };
+    TrayIcon? _tray;
 
     static readonly Regex EmoteRx = new(@":([A-Za-z0-9_\-]{1,40}):", RegexOptions.Compiled | RegexOptions.CultureInvariant);
     FontFamily _font = new("Segoe UI, Segoe UI Emoji, Segoe UI Symbol");
@@ -61,22 +62,20 @@ public partial class MainWindow : Window
             src.CompositionTarget.RenderMode = RenderMode.SoftwareOnly;
             src.AddHook(WndProc);
             RegisterHotKey(src.Handle, HotkeyId, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, VK_F12);
+            // Ventana de herramienta: fuera de Alt+Tab y de la barra de tareas, y sin robarle nunca el foco al juego.
+            var ex = GetWindowLong(src.Handle, GWL_EXSTYLE);
+            SetWindowLong(src.Handle, GWL_EXSTYLE, (ex | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE) & ~WS_EX_APPWINDOW);
+            _tray = new TrayIcon(src.Handle, WM_TRAY);
+            _topmost.Start();
             ApplySettings();
             SetLocked(_s.Locked);
         };
-        ContentRendered += (_, _) => Dispatcher.BeginInvoke(() => _ready = true, DispatcherPriority.ApplicationIdle);
-        Activated += (_, _) =>
-        {
-            // Con el chat bloqueado no recibe clics; si se activa es porque lo has pulsado en la barra de tareas.
-            if (_ready && _s.Locked) SetLocked(false);
-        };
-        StateChanged += (_, _) =>
-        {
-            // Bloqueado y en primer plano, un clic en la barra de tareas lo minimizaría: lo devolvemos y desbloqueamos.
-            if (_s.Locked && WindowState == WindowState.Minimized) { WindowState = WindowState.Normal; SetLocked(false); Activate(); }
-        };
+        // Algunos juegos y apps se ponen por encima al coger el foco: cada 2 s reafirmamos que el chat va arriba del todo.
+        // Es una sola llamada a Windows que no mueve ni redibuja nada.
+        _topmost.Tick += (_, _) => KeepOnTop();
+        Deactivated += (_, _) => KeepOnTop();
         Closing += (_, _) => SaveWindow();
-        Closed += (_, _) => { _cts?.Cancel(); _client.Dispose(); };
+        Closed += (_, _) => { _tray?.Dispose(); _cts?.Cancel(); _client.Dispose(); };
         Loaded += (_, _) => Start();
     }
 
@@ -417,6 +416,11 @@ public partial class MainWindow : Window
         SetWindowLong(hwnd, GWL_EXSTYLE, ex);
         Bar.Visibility = locked ? Visibility.Collapsed : Visibility.Visible;
         ResizeMode = locked ? ResizeMode.NoResize : ResizeMode.CanResizeWithGrip;
+        if (locked && !_s.LockTipShown && _tray != null)
+        {
+            _tray.ShowBalloon("Chat bloqueado", "Para desbloquearlo haz clic en este icono o pulsa Ctrl+Shift+F12.");
+            _s.LockTipShown = true;
+        }
         _s.Save();
     }
 
@@ -475,6 +479,32 @@ public partial class MainWindow : Window
         _trim.Stop(); _trim.Start();
     }
 
+    void ShowTrayMenu()
+    {
+        var cmd = _tray!.ShowMenu(
+        [
+            (1, _s.Locked ? "Desbloquear chat	Ctrl+Shift+F12" : "Bloquear chat	Ctrl+Shift+F12"),
+            (2, IsVisible ? "Ocultar chat" : "Mostrar chat"),
+            (3, "Ajustes…"),
+            (0, ""),
+            (4, "Salir"),
+        ]);
+        switch (cmd)
+        {
+            case 1: SetLocked(!_s.Locked); break;
+            case 2: if (IsVisible) Hide(); else { Show(); KeepOnTop(); } break;
+            case 3: if (!IsVisible) Show(); Settings_Click(this, new RoutedEventArgs()); break;
+            case 4: Close(); break;
+        }
+    }
+
+    void KeepOnTop()
+    {
+        var h = new WindowInteropHelper(this).Handle;
+        if (h != IntPtr.Zero && IsVisible)
+            SetWindowPos(h, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+    }
+
     static T Freeze<T>(T f) where T : Freezable { f.Freeze(); return f; }
 
     // ───────────────────────── Win32 ─────────────────────────
@@ -482,7 +512,12 @@ public partial class MainWindow : Window
     const int HotkeyId = 0x5354;
     const int WM_HOTKEY = 0x0312;
     const uint MOD_CONTROL = 0x2, MOD_SHIFT = 0x4, MOD_NOREPEAT = 0x4000, VK_F12 = 0x7B;
-    const int GWL_EXSTYLE = -20, WS_EX_TRANSPARENT = 0x20, WS_EX_LAYERED = 0x80000;
+    const int GWL_EXSTYLE = -20, WS_EX_TRANSPARENT = 0x20, WS_EX_LAYERED = 0x80000,
+              WS_EX_TOOLWINDOW = 0x80, WS_EX_APPWINDOW = 0x40000, WS_EX_NOACTIVATE = 0x8000000;
+    const int WM_TRAY = 0x8001, WM_LBUTTONUP = 0x0202, WM_RBUTTONUP = 0x0205;
+    static readonly IntPtr HWND_TOPMOST = new(-1);
+    const uint SWP_NOSIZE = 0x1, SWP_NOMOVE = 0x2, SWP_NOACTIVATE = 0x10, SWP_NOOWNERZORDER = 0x200;
+    [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
 
     IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
@@ -490,6 +525,17 @@ public partial class MainWindow : Window
         {
             SetLocked(!_s.Locked);
             handled = true;
+        }
+        else if (msg == WM_TRAY)
+        {
+            int ev = lParam.ToInt32() & 0xFFFF;
+            if (ev == WM_LBUTTONUP) SetLocked(!_s.Locked);
+            else if (ev == WM_RBUTTONUP) ShowTrayMenu();
+            handled = true;
+        }
+        else if (msg == TrayIcon.TaskbarCreated)
+        {
+            _tray?.Add(); // el explorador se ha reiniciado: volvemos a poner el icono
         }
         return IntPtr.Zero;
     }

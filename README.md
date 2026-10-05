@@ -4,6 +4,10 @@
 
 Chat de [Starvios](https://starvios.com) **transparente y siempre encima** del juego, para streamers con un solo monitor. Lo pones encima del juego en ventana o en ventana sin bordes, lo bloqueas y el ratón lo atraviesa como si no estuviera.
 
+No sale en Alt+Tab ni en la barra de tareas y nunca le quita el foco al juego: vive en los iconos ocultos de la bandeja.
+
+> Funciona con juegos en **ventana** o **ventana sin bordes**. Ninguna ventana se puede poner encima de un juego en pantalla completa exclusiva.
+
 Es una versión para Starvios de [Transparent Twitch Chat Overlay](https://github.com/baffler/Transparent-Twitch-Chat-Overlay) de baffler, rehecha desde cero para que gaste lo mínimo.
 
 ## Por qué gasta tan poco
@@ -33,7 +37,8 @@ Medido en un PC con Windows 11 y el chat de un directo abierto: **unos 57 MB de 
 | Mover | Arrastra la barra de arriba |
 | Cambiar el tamaño | Arrastra la esquina de abajo a la derecha |
 | **Bloquear** (el ratón lo atraviesa y la barra desaparece) | Botón 🔒 |
-| **Desbloquear** | **Ctrl + Shift + F12** o un clic en su icono de la barra de tareas |
+| **Desbloquear** | Un clic en su icono de la bandeja (iconos ocultos, junto al reloj) o **Ctrl + Shift + F12** |
+| Menú (bloquear, ocultar/mostrar, ajustes, salir) | Clic derecho en el icono de la bandeja |
 | Ajustes | Botón ⚙ |
 
 En los ajustes puedes cambiar:

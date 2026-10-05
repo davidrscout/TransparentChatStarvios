@@ -18,6 +18,7 @@ public sealed class Settings
     public bool ShowEmotes { get; set; } = true;
     public bool TextShadow { get; set; } = true;
     public bool Locked { get; set; } = false;
+    public bool LockTipShown { get; set; } = false;
 
     public double Left { get; set; } = 60;
     public double Top { get; set; } = 120;
