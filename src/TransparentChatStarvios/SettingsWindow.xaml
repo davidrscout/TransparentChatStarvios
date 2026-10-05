@@ -1,0 +1,50 @@
+<Window x:Class="TransparentChatStarvios.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ajustes — Transparent Chat Starvios" Icon="icon.ico"
+        Width="400" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" Topmost="True"
+        Background="#FF17131F" Foreground="#FFEDEAF5" FontFamily="Segoe UI" FontSize="13">
+    <Window.Resources>
+        <Style TargetType="TextBlock"><Setter Property="Margin" Value="0,10,0,3"/></Style>
+        <Style TargetType="CheckBox"><Setter Property="Foreground" Value="#FFEDEAF5"/><Setter Property="Margin" Value="0,8,0,0"/></Style>
+    </Window.Resources>
+    <StackPanel Margin="18,8,18,18">
+        <TextBlock Text="Canal de Starvios (nombre o enlace del chat)"/>
+        <TextBox x:Name="Channel" Padding="4,3"/>
+        <TextBlock Foreground="#99EDEAF5" FontSize="11" Margin="0,3,0,0" Text="Ej.: natu  ·  https://starvios.com/popout/chat/natu"/>
+
+        <TextBlock Text="Fuente"/>
+        <ComboBox x:Name="FontPicker" IsEditable="False" MaxDropDownHeight="320">
+            <ComboBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel/></ItemsPanelTemplate></ComboBox.ItemsPanel>
+            <ComboBox.ItemTemplate>
+                <DataTemplate><TextBlock Margin="0" Text="{Binding}" FontFamily="{Binding}" FontSize="14"/></DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <CheckBox x:Name="BoldNames" Content="Nombres en negrita"/>
+
+        <TextBlock x:Name="FontLabel"/>
+        <Slider x:Name="FontSlider" Minimum="10" Maximum="32" TickFrequency="1" IsSnapToTickEnabled="True"/>
+
+        <TextBlock x:Name="OpacityLabel"/>
+        <Slider x:Name="OpacitySlider" Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True"/>
+
+        <TextBlock x:Name="HideLabel"/>
+        <Slider x:Name="HideAfter" Minimum="0" Maximum="300" TickFrequency="5" IsSnapToTickEnabled="True"/>
+
+        <TextBlock x:Name="MaxLabel"/>
+        <Slider x:Name="MaxMessages" Minimum="20" Maximum="300" TickFrequency="10" IsSnapToTickEnabled="True"/>
+
+        <CheckBox x:Name="ShowBadges" Content="Mostrar insignias (dueño, mod, VIP, suscriptor…)"/>
+        <CheckBox x:Name="ShowEmotes" Content="Mostrar emotes de Starvios"/>
+        <CheckBox x:Name="TextShadow" Content="Sombra en el texto (se lee mejor sobre el juego)"/>
+
+        <TextBlock Foreground="#99EDEAF5" FontSize="11" TextWrapping="Wrap" Margin="0,14,0,0"
+                   Text="🔒 bloquea el chat: el ratón lo atraviesa y la barra desaparece. Para desbloquear pulsa Ctrl+Shift+F12 o haz clic en su icono de la barra de tareas."/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancelar" Width="90" Margin="0,0,8,0" IsCancel="True"/>
+            <Button Content="Guardar" Width="90" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -305,3 +305,5 @@ tools/
 # NativeChat Resources
 TransparentTwitchChatWPF/Resources/native-chat.zip
 NativeChatClient/dist/
+# Salida de build.ps1
+dist/

@@ -1,35 +1,75 @@
-# Transparent Twitch Chat Overlay
-[![GitHub](https://img.shields.io/github/license/baffler/Transparent-Twitch-Chat-Overlay)](https://raw.githubusercontent.com/baffler/Transparent-Twitch-Chat-Overlay/master/LICENSE)
-[![GitHub release (with filter)](https://img.shields.io/github/v/release/baffler/Transparent-Twitch-Chat-Overlay)](https://github.com/baffler/Transparent-Twitch-Chat-Overlay/releases)
+<p align="center"><img src="icon.png" width="96" alt=""></p>
 
-.NET application for Windows that will display Twitch chat on top of a windowed or borderless windowed game. Typically would be used by single monitor streamers who need to see chat while playing.
+# Transparent Chat Starvios
 
-**Be sure to check out the wiki** [at this link](https://github.com/baffler/Transparent-Twitch-Chat-Overlay/wiki). There's explanations on there on how to add different types of chat, Twitch and Youtube chat integrated together, show subs/followers/redemptions etc, how to show viewer count, or any widget you might need.
+Chat de [Starvios](https://starvios.com) **transparente y siempre encima** del juego, para streamers con un solo monitor. Lo pones encima del juego en ventana o en ventana sin bordes, lo bloqueas y el ratón lo atraviesa como si no estuviera.
 
-* To create an issue: https://github.com/baffler/Transparent-Twitch-Chat-Overlay/issues
-* For feature requests or questions: https://github.com/baffler/Transparent-Twitch-Chat-Overlay/discussions
+Es una versión para Starvios de [Transparent Twitch Chat Overlay](https://github.com/baffler/Transparent-Twitch-Chat-Overlay) de baffler, rehecha desde cero para que gaste lo mínimo.
 
-![Screenshot](https://i.imgur.com/keN4f9F.jpg)
+## Por qué gasta tan poco
 
-## Installation and Usage
-* Download the latest release from https://github.com/baffler/Transparent-Twitch-Chat-Overlay/releases
-* You can download the Installer now to make it easier to install the program and it will automatically install the required dependencies ([WebView2 runtimes](https://go.microsoft.com/fwlink/p/?LinkId=2124703)).
-* "Windows protected your PC" message may appear which is the Windows Defender Smart Screen. You'll need to click "More info" and then "Run anyway". You'll only have to do this the first time you launch it.
-* After launching the program for the first time, you'll need to set your twitch channel in the settings. You can click the button at the top-left to open settings, right-click the black border at top, or right-click the icon in the taskbar
-* You can move the application by clicking and dragging the thin black border at top, and you can resize it by clicking and dragging the grip at the bottom-right
-* To hide the borders, just click the [o] button in the top-right, or right-click the icon in your taskbar
+El original carga una página web dentro de un navegador embebido (WebView2), y eso arranca varios procesos de Edge. Esta versión **no usa ningún navegador**:
 
-![Screenshot](https://i.imgur.com/B3SDcrk.png)
+- Lee el chat directamente de la API pública de Starvios y recibe los mensajes nuevos al momento, por WebSocket.
+- Pinta los mensajes con controles nativos de Windows (WPF) y lo hace por CPU, así no le quita GPU al juego.
+- Corre con prioridad baja, guarda en disco los emotes que ya ha bajado y devuelve la memoria que no usa.
+- En reposo usa 0 % de CPU, porque solo redibuja cuando llega un mensaje.
+- El ejecutable pesa unos 280 KB.
 
-## Adding widgets (subs/follows/viewer count/etc...)
-Some commonly requested features can usually be added with widgets. Please check out the wiki for an explanation on how to do this: https://github.com/baffler/Transparent-Twitch-Chat-Overlay/wiki
+Medido en un PC con Windows 11 y el chat de un directo abierto: **unos 57 MB de RAM y 0,00 % de CPU en reposo**.
 
-## Star History
+## Instalación
 
-<a href="https://star-history.com/#baffler/Transparent-Twitch-Chat-Overlay&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=baffler/Transparent-Twitch-Chat-Overlay&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=baffler/Transparent-Twitch-Chat-Overlay&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=baffler/Transparent-Twitch-Chat-Overlay&type=Date" />
- </picture>
-</a>
+1. Instala [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) si no lo tienes (en la mayoría de PC con Windows 11 ya viene).
+2. Descarga `TransparentChatStarvios.exe` de [Releases](../../releases) y ábrelo. No hace falta instalar nada más.
+3. Pulsa **⚙** y escribe tu canal: vale el nombre (`natu`) o el enlace del chat (`https://starvios.com/popout/chat/natu`).
+
+> La primera vez Windows puede enseñar el aviso «Windows protegió su PC». Pulsa «Más información» y luego «Ejecutar de todas formas».
+
+## Uso
+
+| Acción | Cómo |
+|---|---|
+| Mover | Arrastra la barra de arriba |
+| Cambiar el tamaño | Arrastra la esquina de abajo a la derecha |
+| **Bloquear** (el ratón lo atraviesa y la barra desaparece) | Botón 🔒 |
+| **Desbloquear** | **Ctrl + Shift + F12** o un clic en su icono de la barra de tareas |
+| Ajustes | Botón ⚙ |
+
+En los ajustes puedes cambiar:
+
+- El canal.
+- La fuente (cualquiera de las instaladas) y si los nombres van en negrita.
+- El tamaño de la letra.
+- La opacidad del fondo, de 0 a 100 %.
+- Ocultar los mensajes pasados unos segundos.
+- Cuántos mensajes se ven a la vez.
+- Si se muestran insignias y emotes.
+- La sombra del texto.
+
+Los ajustes y la posición de la ventana se guardan en `%APPDATA%\TransparentChatStarvios\settings.json`.
+
+## Qué muestra
+
+- El color de nombre de cada usuario.
+- Las insignias: 👑 dueño, ⚡ staff o admin, 🛡 moderador, ♦ VIP, ♥ suscriptor, y ✔ en las cuentas verificadas.
+- Los emotes de Starvios (`:código:`). Los animados se ven como imagen fija.
+- Suscripciones, raids, Lluvias de Estrellas y donaciones de Starvies, resaltados.
+- Los mensajes del sistema de Starvios.
+- Los mensajes que borra un moderador desaparecen al momento.
+- Igual que en la web: cuando el directo lleva más de 15 minutos terminado, deja de enseñar el chat viejo.
+
+Es **solo de lectura**: no inicia sesión, no pide contraseñas y no puede escribir en el chat.
+
+## Compilar
+
+Hace falta el [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+
+```powershell
+./build.ps1        # deja dist/TransparentChatStarvios.exe
+```
+
+## Licencia
+
+GPL-3.0, la misma que el proyecto original. Consulta [LICENSE](LICENSE).
+Proyecto independiente, sin relación oficial con Starvios ni con Twitch.
